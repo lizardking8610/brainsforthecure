@@ -1,0 +1,14 @@
+*.log
+
+backup-db/
+advanced-cache.php
+backups/
+blogs.dir/
+cache/
+upgrade/
+uploads/
+mu-plugins/
+wp-cache-config.php
+plugins/hello.php
+
+.DS_Store
