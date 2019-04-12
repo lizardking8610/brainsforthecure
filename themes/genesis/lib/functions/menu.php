@@ -7,8 +7,8 @@
  *
  * @package Genesis\Menus
  * @author  StudioPress
- * @license GPL-2.0+
- * @link    http://my.studiopress.com/themes/genesis/
+ * @license GPL-2.0-or-later
+ * @link    https://my.studiopress.com/themes/genesis/
  */
 
 /**
@@ -65,22 +65,29 @@ function genesis_superfish_enabled() {
  */
 function genesis_get_nav_menu( $args = array() ) {
 
-	$args = wp_parse_args( $args, array(
-		'theme_location' => '',
-		'container'      => '',
-		'menu_class'     => 'menu genesis-nav-menu',
-		'link_before'    => genesis_markup( array( 
+	$args = wp_parse_args(
+		$args,
+		array(
+			'theme_location' => '',
+			'container'      => '',
+			'menu_class'     => 'menu genesis-nav-menu',
+			'link_before'    => genesis_markup(
+				array(
 					'open'    => '<span %s>',
 					'context' => 'nav-link-wrap',
 					'echo'    => false,
-				) ),
-		'link_after'     => genesis_markup( array( 
+				)
+			),
+			'link_after'     => genesis_markup(
+				array(
 					'close'   => '</span>',
 					'context' => 'nav-link-wrap',
 					'echo'    => false,
-				) ),
-		'echo'           => 0,
-	) );
+				)
+			),
+			'echo'           => 0,
+		)
+	);
 
 	// If a menu is not assigned to theme location, abort.
 	if ( ! has_nav_menu( $args['theme_location'] ) ) {
@@ -101,28 +108,31 @@ function genesis_get_nav_menu( $args = array() ) {
 		return null;
 	}
 
-	$nav_markup_open = genesis_structural_wrap( 'menu-' . $sanitized_location, 'open', 0 );
-	$nav_markup_close  = genesis_structural_wrap( 'menu-' . $sanitized_location, 'close', 0 );
+	$nav_markup_open  = genesis_get_structural_wrap( 'menu-' . $sanitized_location, 'open' );
+	$nav_markup_close = genesis_get_structural_wrap( 'menu-' . $sanitized_location, 'close' );
+
 	$params = array(
 		'theme_location' => $args['theme_location'],
 	);
 
-	$nav_output = genesis_markup( array(
-		'open'    => '<nav %s>',
-		'close'   => '</nav>',
-		'context' => 'nav-' . $sanitized_location,
-		'content' => $nav_markup_open . $nav . $nav_markup_close,
-		'echo'    => false,
-		'params'  => $params,
-	) );
+	$nav_output = genesis_markup(
+		array(
+			'open'    => '<nav %s>',
+			'close'   => '</nav>',
+			'context' => 'nav-' . $sanitized_location,
+			'content' => $nav_markup_open . $nav . $nav_markup_close,
+			'echo'    => false,
+			'params'  => $params,
+		)
+	);
 
-	$filter_location = 'genesis_' . $sanitized_location . '_nav';
+	$filter_location = $sanitized_location . '_nav';
 
 	// Handle back-compat for primary and secondary nav filters.
 	if ( 'primary' === $args['theme_location'] ) {
-		$filter_location = 'genesis_do_nav';
+		$filter_location = 'do_nav';
 	} elseif ( 'secondary' === $args['theme_location'] ) {
-		$filter_location = 'genesis_do_subnav';
+		$filter_location = 'do_subnav';
 	}
 
 	/**
@@ -141,7 +151,7 @@ function genesis_get_nav_menu( $args = array() ) {
 	 *     @type bool $echo 0 to indicate `wp_nav_menu()` should return not echo.
 	 * }
 	 */
-	return apply_filters( $filter_location, $nav_output, $nav, $args );
+	return apply_filters( "genesis_{$filter_location}", $nav_output, $nav, $args );
 }
 
 /**
@@ -149,7 +159,7 @@ function genesis_get_nav_menu( $args = array() ) {
  *
  * @since 2.1.0
  *
- * @param string $args Menu arguments.
+ * @param string|array $args Menu arguments.
  */
 function genesis_nav_menu( $args ) {
 	echo genesis_get_nav_menu( $args );

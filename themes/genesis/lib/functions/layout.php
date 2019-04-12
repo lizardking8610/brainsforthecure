@@ -7,8 +7,8 @@
  *
  * @package Genesis\Layout
  * @author  StudioPress
- * @license GPL-2.0+
- * @link    http://my.studiopress.com/themes/genesis/
+ * @license GPL-2.0-or-later
+ * @link    https://my.studiopress.com/themes/genesis/
  */
 
 add_action( 'genesis_setup', 'genesis_create_initial_layouts' );
@@ -31,40 +31,7 @@ function genesis_create_initial_layouts() {
 	// Common path to default layout images.
 	$url = GENESIS_ADMIN_IMAGES_URL . '/layouts/';
 
-	$layouts = apply_filters( 'genesis_initial_layouts', array(
-		'content-sidebar' => array(
-			'label'   => __( 'Content, Primary Sidebar', 'genesis' ),
-			'img'     => $url . 'cs.gif',
-			'default' => is_rtl() ? false : true,
-			'type'    => array( 'site' ),
-		),
-		'sidebar-content' => array(
-			'label'   => __( 'Primary Sidebar, Content', 'genesis' ),
-			'img'     => $url . 'sc.gif',
-			'default' => is_rtl() ? true : false,
-			'type'    => array( 'site' ),
-		),
-		'content-sidebar-sidebar' => array(
-			'label' => __( 'Content, Primary Sidebar, Secondary Sidebar', 'genesis' ),
-			'img'   => $url . 'css.gif',
-			'type'  => array( 'site' ),
-		),
-		'sidebar-sidebar-content' => array(
-			'label' => __( 'Secondary Sidebar, Primary Sidebar, Content', 'genesis' ),
-			'img'   => $url . 'ssc.gif',
-			'type'  => array( 'site' ),
-		),
-		'sidebar-content-sidebar' => array(
-			'label' => __( 'Secondary Sidebar, Content, Primary Sidebar', 'genesis' ),
-			'img'   => $url . 'scs.gif',
-			'type'  => array( 'site' ),
-		),
-		'full-width-content' => array(
-			'label' => __( 'Full Width Content', 'genesis' ),
-			'img'   => $url . 'c.gif',
-			'type'  => array( 'site' ),
-		),
-	), $url );
+	$layouts = apply_filters( 'genesis_initial_layouts', genesis_get_config( 'layouts' ), $url );
 
 	foreach ( (array) $layouts as $layout_id => $layout_args ) {
 		genesis_register_layout( $layout_id, $layout_args );
@@ -128,9 +95,8 @@ function genesis_register_layout( $id = '', $args = array() ) {
  *
  * @since 2.5.1
  *
- * @param string $id ID of layout.
+ * @param string       $id   ID of layout.
  * @param array|string $type Array (or string of single type) of types to add.
- *
  * @return array Return merged type array.
  */
 function genesis_add_type_to_layout( $id, $type = array() ) {
@@ -141,7 +107,6 @@ function genesis_add_type_to_layout( $id, $type = array() ) {
 
 	$_genesis_layouts[ $id ]['type'] = $new_type;
 
-	// Return new type array
 	return $new_type;
 
 }
@@ -151,9 +116,8 @@ function genesis_add_type_to_layout( $id, $type = array() ) {
  *
  * @since 2.5.1
  *
- * @param string $id ID of layout.
+ * @param string       $id   ID of layout.
  * @param array|string $type Array (or string of single type) of types to remove.
- *
  * @return array Return type array.
  */
 function genesis_remove_type_from_layout( $id, $type = array() ) {
@@ -164,7 +128,6 @@ function genesis_remove_type_from_layout( $id, $type = array() ) {
 
 	$_genesis_layouts[ $id ]['type'] = $new_type;
 
-	// Return new type array
 	return $new_type;
 
 }
@@ -261,7 +224,7 @@ function genesis_get_layouts( $type = 'site' ) {
 	$types[] = 'site';
 
 	if ( is_numeric( $types[0] ) ) {
-		$id = $types[0];
+		$id       = $types[0];
 		$types[0] = $types[1] . '-' . $types[0];
 	}
 
@@ -285,7 +248,7 @@ function genesis_get_layouts( $type = 'site' ) {
 	 * @since 2.5.0
 	 *
 	 * @param array  $layouts Layout data.
-	 * @param string $type 	  Layout type.
+	 * @param string $type    Layout type.
 	 */
 	$layouts = (array) apply_filters( 'genesis_get_layouts', $layouts, $type );
 
@@ -313,7 +276,7 @@ function genesis_get_layouts_for_customizer( $type = 'site' ) {
 
 	// Simplified layout array.
 	foreach ( (array) $layouts as $id => $data ) {
-		$customizer_layouts[$id] = $data['label'];
+		$customizer_layouts[ $id ] = $data['label'];
 	}
 
 	return $customizer_layouts;
@@ -325,7 +288,8 @@ function genesis_get_layouts_for_customizer( $type = 'site' ) {
  *
  * @since 1.4.0
  *
- * @param string $id ID of the layout to return data for.
+ * @param string $id   ID of the layout to return data for.
+ * @param string $type Optional. Layout type. Default is 'site'.
  * @return null|array `null` if ID is not set, or layout is not registered. Array of layout data
  *                    otherwise, with 'label' and 'image' (and possibly 'default') sub-keys.
  */
@@ -333,11 +297,11 @@ function genesis_get_layout( $id, $type = 'site' ) {
 
 	$layouts = genesis_get_layouts( $type );
 
-	if ( ! $id || ! isset( $layouts[$id] ) ) {
+	if ( ! $id || ! isset( $layouts[ $id ] ) ) {
 		return null;
 	}
 
-	return $layouts[$id];
+	return $layouts[ $id ];
 
 }
 
@@ -391,7 +355,7 @@ function genesis_has_multiple_layouts( $type = 'site' ) {
  *
  * Applies `genesis_site_layout` filter early to allow shortcutting of function.
  *
- * @since 0.2.2
+ * @since 1.0.0
  *
  * @global WP_Query $wp_query Query object.
  *
@@ -416,7 +380,6 @@ function genesis_site_layout( $use_cache = true ) {
 		if ( '' !== $layout_cache ) {
 			return esc_attr( $layout_cache );
 		}
-
 	}
 
 	global $wp_query;
@@ -424,45 +387,34 @@ function genesis_site_layout( $use_cache = true ) {
 	// Default to site for layout type.
 	$type = 'site';
 
-	// If viewing a singular page or post, or the posts page, but not the front page.
-	if ( is_singular() || ( is_home() && ! genesis_is_root_page() ) ) {
+	if ( is_singular() || ( is_home() && ! genesis_is_root_page() ) ) { // If viewing a singular page or post, or the posts page, but not the front page.
 
 		$post_id      = is_home() ? get_option( 'page_for_posts' ) : null;
 		$custom_field = genesis_get_custom_field( '_genesis_layout', $post_id );
 		$site_layout  = $custom_field ? $custom_field : genesis_get_option( 'site_layout' );
 		$type         = array( 'singular', get_post_type(), $post_id );
 
-	}
-
-	// If viewing a taxonomy archive.
-	elseif ( is_category() || is_tag() || is_tax() ) {
+	} elseif ( is_category() || is_tag() || is_tax() ) { // If viewing a taxonomy archive.
 
 		$term        = $wp_query->get_queried_object();
-		$term_layout = $term ? get_term_meta( $term->term_id, 'layout', true) : '';
+		$term_layout = $term ? get_term_meta( $term->term_id, 'layout', true ) : '';
 		$site_layout = $term_layout ? $term_layout : genesis_get_option( 'site_layout' );
 		$type        = array( 'archive', $term->taxonomy, $term->term_id );
 
-	}
-
-	// If viewing a supported post type.
-	elseif ( is_post_type_archive() && genesis_has_post_type_archive_support() ) {
+	} elseif ( is_post_type_archive() && genesis_has_post_type_archive_support() ) { // If viewing a supported post type.
 
 		$site_layout = genesis_get_cpt_option( 'layout' ) ? genesis_get_cpt_option( 'layout' ) : genesis_get_option( 'site_layout' );
 		$type        = array( 'archive', 'post-type-archive-' . get_post_type() );
 
-	}
-
-	// If viewing an author archive.
-	elseif ( is_author() ) {
+	} elseif ( is_author() ) { // If viewing an author archive.
 
 		$site_layout = get_the_author_meta( 'layout', (int) get_query_var( 'author' ) ) ? get_the_author_meta( 'layout', (int) get_query_var( 'author' ) ) : genesis_get_option( 'site_layout' );
 		$type        = array( 'archive', 'author', get_query_var( 'author' ) );
 
-	}
+	} else { // Else pull the theme option.
 
-	// Else pull the theme option.
-	else {
 		$site_layout = genesis_get_option( 'site_layout' );
+
 	}
 
 	// Use default layout as a fallback, if necessary.
@@ -543,20 +495,19 @@ function genesis_layout_selector( $args = array() ) {
 }
 
 /**
- * Potentially echo or return a structural wrap div.
+ * Return a structural wrap div.
  *
  * A check is made to see if the `$context` is in the `genesis-structural-wraps` theme support data. If so, then the
  * `$output` may be echoed or returned.
  *
- * @since 1.6.0
+ * @since 2.7.0
  *
  * @param string $context The location ID.
  * @param string $output  Optional. The markup to include. Can also be 'open'
- *                        (default) or 'closed' to use pre-determined markup for consistency.
- * @param bool   $echo    Optional. Whether to echo or return. Default is true (echo).
+ *                        (default) or 'close' to use pre-determined markup for consistency.
  * @return null|string Wrap HTML, or `null` if `genesis-structural-wraps` support is falsy.
  */
-function genesis_structural_wrap( $context = '', $output = 'open', $echo = true ) {
+function genesis_get_structural_wrap( $context = '', $output = 'open' ) {
 
 	$wraps = get_theme_support( 'genesis-structural-wraps' );
 
@@ -594,17 +545,53 @@ function genesis_structural_wrap( $context = '', $output = 'open', $echo = true 
 			break;
 	}
 
-	$output = apply_filters( "genesis_structural_wrap-{$context}", $output, $original_output );
+	$output = apply_filters( "genesis_structural_wrap-{$context}", $output, $original_output ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores -- Genesis way of dynamic filters.
 
-	if ( $echo ) {
-		echo $output;
+	return $output;
 
-		return null;
-	} else {
+}
+
+/**
+ * Echo a structural wrap div.
+ *
+ * A check is made to see if the `$context` is in the `genesis-structural-wraps` theme support data. If so, then the
+ * `$output` may be echoed or returned.
+ *
+ * @since 1.6.0
+ * @since 2.7.0 Logic moved to `genesis_get_structural_wrap()` and third parameter deprecated.
+ *
+ * @param string $context    The location ID.
+ * @param string $output     Optional. The markup to include. Can also be 'open'
+ *                           (default) or 'close' to use pre-determined markup for consistency.
+ * @param bool   $deprecated Deprecated.
+ * @return null|string Wrap HTML, or `null` if `genesis-structural-wraps` support is falsy.
+ */
+function genesis_structural_wrap( $context = '', $output = 'open', $deprecated = null ) {
+
+	if ( null !== $deprecated ) {
+		$message = __( 'The default is true, so remove the third argument.', 'genesis' );
+
+		if ( false === (bool) $deprecated ) {
+			$message = __( 'Use `genesis_get_structural_wrap()` instead.', 'genesis' );
+		}
+
+		_deprecated_argument( __FUNCTION__, '2.7.0', esc_html( $message ) );
+	}
+
+	$output = genesis_get_structural_wrap( $context, $output );
+
+	// Apply original default value.
+	$deprecated = null === $deprecated ? true : $deprecated;
+
+	if ( false === (bool) $deprecated ) { // Kept for backwards compatibility.
 		return $output;
 	}
 
+	echo $output;
+
 }
+
+// phpcs:disable PHPCompatibility.FunctionNameRestrictions.ReservedFunctionNames.FunctionDoubleUnderscore, WordPress.NamingConventions.ValidFunctionName.FunctionDoubleUnderscore, WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Highly unlikely PHP will start using __genesis.
 
 /**
  * Return layout key 'content-sidebar'.

@@ -211,3 +211,10 @@ genesis_register_sidebar( array(
 	'name'        => __( 'After Entry', 'metro-pro' ),
 	'description' => __( 'This is the after entry section.', 'metro-pro' ),
 ) );
+
+//* Change the footer text
+add_filter('genesis_footer_creds_text', 'sp_footer_creds_filter');
+function sp_footer_creds_filter( $creds ) {
+	$creds = '[footer_copyright] &middot; <a href="https://brainsforthecure.org">Brains for the Cure</a> &middot; A program of the <a href="https://www.headforthecure.org" title="Head for the Cure">Head for the Cure Foundation</a>';
+	return $creds;
+}
