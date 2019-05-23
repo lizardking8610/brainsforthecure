@@ -261,8 +261,14 @@ class WPSEO_Premium_Prominent_Words_Recalculation implements WPSEO_WordPress_Int
 			),
 		);
 
+		// Add feature flags to localization data.
+		$localization_data = array(
+			'data'            => $data,
+			'enabledFeatures' => WPSEO_Utils::retrieve_enabled_features(),
+		);
+
 		wp_enqueue_script( WPSEO_Admin_Asset_Manager::PREFIX . 'premium-site-wide-analysis' );
-		wp_localize_script( WPSEO_Admin_Asset_Manager::PREFIX . 'premium-site-wide-analysis', 'yoastSiteWideAnalysisData', array( 'data' => $data ) );
+		wp_localize_script( WPSEO_Admin_Asset_Manager::PREFIX . 'premium-site-wide-analysis', 'yoastSiteWideAnalysisData', $localization_data );
 	}
 
 	/**
